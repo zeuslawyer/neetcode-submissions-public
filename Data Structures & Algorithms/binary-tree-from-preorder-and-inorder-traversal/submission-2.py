@@ -1,0 +1,73 @@
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+
+class Solution:
+    def buildTree(self, preorder: List[int], inorder: List[int]) -> Optional[TreeNode]:
+        # reference jenny's lecture: https://www.youtube.com/watch?v=PoBGyrIWisE
+        # KEY PROPERTIES:
+        # preorder array is  [node][...left tree][ ...righttree]
+        # inorder array is [...left tree][node][ ...righttree]
+        # so each array is populated with these slices
+        # and the lenghts are obtained from the INORDER array and used to slide the PREORDER array
+
+        if not inorder or not preorder: return None
+        
+        # optimization to avoide .index() hunting
+        # store indexes from inorder array as that gives us index of the root value each time
+        indexOf = {val: i for i, val in enumerate(inorder)}
+
+        self.pre_index = 0 # track the index of the root in preorder which always starts with root
+        
+        # optimisation:  left and right are pointers that delineate preorder left tree and right tree starts and ends.
+        def dfs(left, right):
+            if left > right: return
+            
+            rootvalue= preorder[self.pre_index]
+            root = TreeNode(rootvalue)
+
+            tree_root_index = indexOf[rootvalue]
+
+            self.pre_index+=1
+            
+            root.left = dfs(left, tree_root_index-1)
+            root.right = dfs(tree_root_index+1, right)
+
+            return root
+
+        return dfs(0, len(inorder)-1)
+
+            
+        
+        
+        
+        # indexOf ={}
+        # for i in range(len(inorder)):
+        #     indexOf[inorder[i]]= i
+
+
+        # if not preorder or not inorder: return None
+
+        # root = TreeNode(preorder[0])
+        # # get root index from INORDER array
+        # rootindex = indexOf[root.val]
+        # # rootindex in the INORDER also gives splits INORDER array on the node, which gives size of left/right subtrees 
+
+        # # make slices of each array based on PROPERTIES
+        # left_preorder = preorder[1: rootindex+1]
+        # left_inorder = inorder[:rootindex]
+        # root.left = self.buildTree(left_preorder, left_inorder)
+
+        # right_preorder = preorder[rootindex+1: ]
+        # right_inorder =inorder[rootindex+1:]
+        # root.right = self.buildTree(right_preorder, right_inorder)
+
+        # return root
+
+       
+
+
+
